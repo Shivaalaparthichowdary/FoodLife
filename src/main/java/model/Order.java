@@ -13,6 +13,9 @@ public class Order {
     
     // additional field for join display
     private String restaurantName;
+    
+    private int deliveryboyId;
+    private String deliveryStatus;
 
     public Order() {
     }
@@ -79,5 +82,21 @@ public class Order {
 
     public void setRestaurantName(String restaurantName) {
         this.restaurantName = restaurantName;
+    }
+
+    public int getDeliveryboyId() {
+        return deliveryboyId;
+    }
+
+    public void setDeliveryboyId(int deliveryboyId) {
+        this.deliveryboyId = deliveryboyId;
+    }
+
+    public String getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
     }
 }

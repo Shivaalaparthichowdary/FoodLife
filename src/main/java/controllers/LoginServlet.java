@@ -26,13 +26,37 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String role = request.getParameter("role");
 
         User user = userDao.loginUser(username, password);
 
         if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("loggedInUser", user);
-            response.sendRedirect("restaurants"); // will map to RestaurantServlet
+            // Check if the role matches
+            if (user.getRole() != null && user.getRole().equalsIgnoreCase(role)) {
+                HttpSession session = request.getSession();
+                session.setAttribute("loggedInUser", user);
+                
+                // Route to appropriate dashboard
+                switch (role.toLowerCase()) {
+                    case "customer":
+                        response.sendRedirect("restaurants");
+                        break;
+                    case "restaurantowner":
+                        response.sendRedirect("ownerDashboard.jsp");
+                        break;
+                    case "deliveryboy":
+                        response.sendRedirect("delivery");
+                        break;
+                    case "systemadmin":
+                        response.sendRedirect("admin");
+                        break;
+                    default:
+                        response.sendRedirect("login.jsp?error=Invalid role specified");
+                        break;
+                }
+            } else {
+                response.sendRedirect("login.jsp?error=Invalid role for this user");
+            }
         } else {
             response.sendRedirect("login.jsp?error=Invalid username or password");
         }

@@ -138,4 +138,96 @@ public class OrderDaoImpl implements OrderDao {
         }
         return list;
     }
+
+    @Override
+    public List<Order> getPendingOrders() {
+        List<Order> list = new ArrayList<>();
+        String query = "SELECT o.orderId, o.userId, o.restaurantId, o.totalAmount, o.status, o.modeOfPayment, o.deliveryboyId, o.deliveryStatus, r.name as restaurantName " +
+                       "FROM orders o JOIN restaurant r ON o.restaurantId = r.restaurantId " +
+                       "WHERE o.deliveryStatus = 'Pending' OR o.deliveryStatus IS NULL ORDER BY o.orderId DESC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("orderId"));
+                order.setUserId(rs.getInt("userId"));
+                order.setRestaurantId(rs.getInt("restaurantId"));
+                order.setTotalAmount(rs.getDouble("totalAmount"));
+                order.setStatus(rs.getString("status"));
+                order.setModeOfPayment(rs.getString("modeOfPayment"));
+                order.setDeliveryboyId(rs.getInt("deliveryboyId"));
+                order.setDeliveryStatus(rs.getString("deliveryStatus"));
+                order.setRestaurantName(rs.getString("restaurantName"));
+                list.add(order);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public List<Order> getOrdersByDeliveryBoy(int deliveryboyId) {
+        List<Order> list = new ArrayList<>();
+        String query = "SELECT o.orderId, o.userId, o.restaurantId, o.totalAmount, o.status, o.modeOfPayment, o.deliveryboyId, o.deliveryStatus, r.name as restaurantName " +
+                       "FROM orders o JOIN restaurant r ON o.restaurantId = r.restaurantId " +
+                       "WHERE o.deliveryboyId = ? ORDER BY o.orderId DESC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setInt(1, deliveryboyId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("orderId"));
+                order.setUserId(rs.getInt("userId"));
+                order.setRestaurantId(rs.getInt("restaurantId"));
+                order.setTotalAmount(rs.getDouble("totalAmount"));
+                order.setStatus(rs.getString("status"));
+                order.setModeOfPayment(rs.getString("modeOfPayment"));
+                order.setDeliveryboyId(rs.getInt("deliveryboyId"));
+                order.setDeliveryStatus(rs.getString("deliveryStatus"));
+                order.setRestaurantName(rs.getString("restaurantName"));
+                list.add(order);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public boolean assignDeliveryBoy(int orderId, int deliveryboyId) {
+        String query = "UPDATE orders SET deliveryboyId = ?, deliveryStatus = 'Assigned', status = 'Out for Delivery' WHERE orderId = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setInt(1, deliveryboyId);
+            pstmt.setInt(2, orderId);
+            return pstmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateDeliveryStatus(int orderId, String status) {
+        String query = "UPDATE orders SET deliveryStatus = ?, status = ? WHERE orderId = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setString(1, status);
+            pstmt.setString(2, status);
+            pstmt.setInt(3, orderId);
+            return pstmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
