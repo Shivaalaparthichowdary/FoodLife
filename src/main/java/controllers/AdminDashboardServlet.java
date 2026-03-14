@@ -1,7 +1,6 @@
 package controllers;
 
 import dao.OrderDao;
-import dao.UserDao;
 import daoImpl.OrderDaoImpl;
 import daoImpl.UserDaoImpl;
 import model.Order;
@@ -26,12 +25,10 @@ import util.DBConnection;
 public class AdminDashboardServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private OrderDao orderDao;
-    private UserDao userDao;
-
     @Override
     public void init() {
         orderDao = new OrderDaoImpl();
-        userDao = new UserDaoImpl();
+        new UserDaoImpl();
     }
 
     @Override
